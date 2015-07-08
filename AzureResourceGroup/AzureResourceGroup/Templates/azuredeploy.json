@@ -1,0 +1,60 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "allowedValues": [
+        "West US",
+        "East US",
+        "West Europe",
+        "East Asia",
+        "Southeast Asia"
+      ],
+      "metadata": {
+        "description": "The region to deploy the resources into"
+      }
+    },
+    "nameSpace": {
+      "type": "string",
+      "defaultValue": "[ResourceGroup().Name]",
+      "metadata": {
+        "description": "The unique namespace for the solution"
+      }
+    },
+    "solution": {
+      "type": "string",
+      "defaultValue": "usdx",
+      "metadata": {
+        "description": "The name of the solution"
+      }
+    }
+  },
+  "variables": {
+    "dcAvailabilitySetName": "[concat(parameters('nameSpace'),parameters('solution'),'dc')]",
+    "infraStorageAccountType": "Standard_LRS",
+    "longNameSuffix": "[concat(parameters('nameSpace'),parameters('solution'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[concat(variables('longNameSuffix'), '1')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('location')]",
+      "properties": {
+        "accountType": "[variables('infraStorageAccountType')]"
+      }
+    },
+    {
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[concat(variables('longNameSuffix'), '2')]",
+			"apiVersion": "2015-05-01-preview",
+			"location": "[parameters('location')]",
+			"properties": {
+			"accountType": "[variables('infraStorageAccountType')]"
+			}
+		}
+  ],
+    "outputs": {
+    }
+}
