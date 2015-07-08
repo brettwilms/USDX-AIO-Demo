@@ -33,10 +33,19 @@
   },
   "variables": {
     "adsAvailabilitySetName": "[concat(variables('namePrefix'),'ads')]",
+    "elbFEConfigID": "[concat(variables('elbID'),'/frontendIPConfigurations/',variables('elbName'))]",
+    "elbID": "[resourceId('Microsoft.Network/loadBalancers',variables('elbName'))]",
+    "elbName": "[concat(variables('namePrefix'),'elb')]",
+    "ilbName": "[concat(variables('namePrefix'),'ilb')]",
+    "ilbIPAddress": "10.0.2.7", 
     "loc": "[tolower(replace(parameters('location'),' ', ''))]",
     "namePrefix": "[concat(parameters('Namespace'), variables('loc'))]",
-    "publicIPName": "[concat(variables('namePrefix'),'ip')]",
-    "publicLBName": "[concat(variables('namePrefix'),'elb')]",
+    "natRDP" : "RDP" ,
+    "pipName": "[concat(variables('namePrefix'),'ip')]",
+    "portHTTP": "80",
+    "portRDP": "3389",
+    "portSSL": "443",
+    "portUDP": "3391",
     "rdsAvailabilitySetName": "[concat(variables('namePrefix'),'rds')]",
     "rgwAvailabilitySetName": "[concat(variables('namePrefix'),'rgw')]",
     "sqlAvailabilitySetName": "[concat(variables('namePrefix'),'sql')]",
@@ -77,7 +86,9 @@
     ],
     "virtualNetworkAddressRange": "10.0.0.0/16",
     "virtualNetworkName": "[concat(variables('namePrefix'),'vnet')]",
-    "webAvailabilitySetName": "[concat(variables('namePrefix'),'web')]"
+    "webAvailabilitySetName": "[concat(variables('namePrefix'),'web')]",
+    "subnetDataRef": "[concat(variables('vnetID'),'/subnets/',variables ('subnetData'))]",
+    "vNetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
   },
   "resources": [
     {
@@ -96,7 +107,7 @@
     {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIPName')]",
+      "name": "[variables('pipName')]",
       "location": "[parameters('location')]",
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
@@ -140,19 +151,110 @@
       "location": "[parameters('location')]"
     },
     {
-			"name": "[variables('virtualNetworkName')]",
-			"type": "Microsoft.Network/virtualNetworks",
-			"location": "[parameters('location')]",
-			"apiVersion": "2015-05-01-preview",
-			"properties": {
-				"addressSpace": {
-				"addressPrefixes": [
-					"[variables('virtualNetworkAddressRange')]"
-				]
-				},
-				"subnets": "[variables('subnets')]"
-			}
-		}
+      "name": "[variables('virtualNetworkName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-05-01-preview",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('virtualNetworkAddressRange')]"
+          ]
+        },
+        "subnets": "[variables('subnets')]"
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "name": "[variables('elbName')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "[variables('elbName')]",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('ilbName')]"
+          }
+        ],
+        "inboundNatRules": [
+          {
+            "name": "[variables('natRDP')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('elbFEConfigID')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": "[variables('portRDP')]",
+              "backendPort": 3389,
+              "enableFloatingIP": false
+            }
+          }
+        ]
+      }
+    },
+    {
+            "apiVersion": "2015-05-01-preview",
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "[variables('ilbName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": ["[variables('vnetID')]"],
+            "properties": {
+                "frontendIpConfigurations": [{
+
+                    "properties": {
+                        "subnet": {
+                            "Id": "[variables('subnetDataRef')]"
+                        },
+                        "privateIPAddress": "[variables('ilbIPAddress')]",
+                        "privateIPAllocationMethod": "Static"
+                    },
+                    "name": "ilbFrontend"
+                }],
+                "backendAddressPools": [{
+                    "name": "SqlBackendPool"
+                }],
+                "loadBalancingRules": [{
+                    "properties": {
+                        "frontendIPConfiguration": {
+                            "Id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('ilbName')), '/frontendIpConfigurations/ilbFrontend')]"
+                        },
+                        "backendAddressPool": {
+                            "Id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('ilbName')), '/backendAddressPools/SqlBackendPool')]"
+                        },
+                        "probe": {
+                            "Id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('ilbName')), '/probes/sqlProbe')]"
+                        },
+						            "protocol": "tcp",
+						            "frontendPort": 1433,
+						            "backendPort": 1433,
+						            "enableFloatingIP": true
+
+                    },
+                    "Name": "sqlListener"
+                }],
+                "probes": [{
+						        "properties": {
+							          "protocol": "tcp",
+							          "port": 59999,
+							          "intervalInSeconds": "5",
+							          "numberOfProbes": "2"
+						            },
+                    "name": "sqlProbe"
+                }]
+            }
+        }
 		],
 	"outputs": {
 		"exampleOutput": {
