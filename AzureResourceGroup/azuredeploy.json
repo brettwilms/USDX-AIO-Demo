@@ -65,7 +65,7 @@
       {
         "name": "[variables('subnetData')]",
         "properties": {
-          "addressPrefix": "[variables('subnetData')]"
+          "addressPrefix": "[variables('subnetRangeData')]"
         }
       },
       {
