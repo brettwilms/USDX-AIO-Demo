@@ -4,6 +4,7 @@
   "parameters": {
     "location": {
       "type": "string",
+      "defaultValue": "East US",
       "allowedValues": [
         "West US",
         "East US",
@@ -17,44 +18,42 @@
     },
     "nameSpace": {
       "type": "string",
-      "defaultValue": "[ResourceGroup().Name]",
+      "defaultValue": "bw",
       "metadata": {
         "description": "The unique namespace for the solution"
       }
     },
     "solution": {
       "type": "string",
-      "defaultValue": "usdx",
+      "defaultValue": "dx",
       "metadata": {
         "description": "The name of the solution"
+      }
+    },
+    "id": {
+      "type": "int",
+      "defaultValue": "1",
+      "metadata": {
+        "description": "The ID of the solution"
       }
     }
   },
   "variables": {
     "dcAvailabilitySetName": "[concat(parameters('nameSpace'),parameters('solution'),'dc')]",
     "infraStorageAccountType": "Standard_LRS",
-    "longNameSuffix": "[concat(parameters('nameSpace'),parameters('solution'))]"
+    "longNameSuffix": "[toLower(concat(parameters('nameSpace'),parameters('solution'),parameters('id')))]",
+    "loc": "[toLower(replace(parameters('location'),' ',''))]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(variables('longNameSuffix'), '1')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[parameters('location')]",
-      "properties": {
-        "accountType": "[variables('infraStorageAccountType')]"
-      }
-    },
-    {
-			"type": "Microsoft.Storage/storageAccounts",
-			"name": "[concat(variables('longNameSuffix'), '2')]",
-			"apiVersion": "2015-05-01-preview",
-			"location": "[parameters('location')]",
-			"properties": {
-			"accountType": "[variables('infraStorageAccountType')]"
-			}
-		}
+
   ],
-    "outputs": {
-    }
+  "outputs": {
+    "O1": {
+      "value": "[variables('loc')]",
+      "type": "string"
+    },
+    "O2": { 
+ 			"value": "[variables('longNameSuffix')]", 
+ 			"type" : "string" 
+      }
 }
