@@ -1,7 +1,21 @@
 ﻿{
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "DnsPrefix": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "metadata": {
+        "description": "The external DNS prefix for the solution - will be prefixed to 'cloudapp.net'"
+      }
+    },
+    "Namespace": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "metadata": {
+        "description": "The namespace of the solution"
+      }
+    },
     "location": {
       "type": "string",
       "defaultValue": "East US",
@@ -15,40 +29,135 @@
       "metadata": {
         "description": "The region to deploy the resources into"
       }
-    },
-    "nameSpace": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().Name]",
-      "metadata": {
-        "description": "The unique namespace for the solution"
-      }
     }
   },
   "variables": {
-    "dcAvailabilitySetName": "[concat(parameters('nameSpace'),'dc')]",
-    "infraStorageAccountType": "Standard_LRS",
-    "loc": "[toLower(replace(parameters('location'),' ',''))]",
-    "nameSuffix" : "[toLower(concat(parameters('nameSpace'), variables('loc')))]"
+    "adsAvailabilitySetName": "[concat(variables('namePrefix'),'ads')]",
+    "loc": "[tolower(replace(parameters('location'),' ', ''))]",
+    "namePrefix": "[concat(parameters('Namespace'), variables('loc'))]",
+    "publicIPName": "[concat(variables('namePrefix'),'ip')]",
+    "publicLBName": "[concat(variables('namePrefix'),'elb')]",
+    "rdsAvailabilitySetName": "[concat(variables('namePrefix'),'rds')]",
+    "rgwAvailabilitySetName": "[concat(variables('namePrefix'),'rgw')]",
+    "sqlAvailabilitySetName": "[concat(variables('namePrefix'),'sql')]",
+    "storageAccountType": "Standard_LRS",
+    "subnetApplication": "Application",
+    "subnetData": "Data",
+    "subnetFront": "Presentation",
+    "subnetManagement": "Management",
+    "subnetRangeApplication": "10.0.1.0/24",
+    "subnetRangeData": "10.0.2.0/24",
+    "subnetRangeFront": "10.0.0.0/24",
+    "subnetRangeManagement": "10.0.3.0/24",
+    "subnets": [
+      {
+        "name": "[variables('subnetFront')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetRangeFront')]"
+        }
+      },
+      {
+        "name": "[variables('subnetApplication')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetRangeApplication')]"
+        }
+      },
+      {
+        "name": "[variables('subnetData')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetData')]"
+        }
+      },
+      {
+        "name": "[variables('subnetManagement')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetRangeManagement')]"
+        }
+      }
+    ],
+    "virtualNetworkAddressRange": "10.0.0.0/16",
+    "virtualNetworkName": "[concat(variables('namePrefix'),'vnet')]",
+    "webAvailabilitySetName": "[concat(variables('namePrefix'),'web')]"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(variables('nameSuffix'), 'sa', copyindex())]",
+      "name": "[concat(variables('namePrefix'), copyindex())]",
       "apiVersion": "2015-05-01-preview",
       "location": "[parameters('location')]",
       "copy": {
         "name": "storageAccountLoop",
-        "count": 3
+        "count": 6
       },
       "properties": {
-        "accountType": "[variables('infraStorageAccountType')]"
+        "accountType": "[variables('storageAccountType')]"
       }
-    }
-  ], 
- 	"outputs": { 
- 		"exampleOutput": { 
- 			"value": "[variables('loc')]", 
- 			"type" : "string" 
- 		} 
- 	} 
- } 
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicIPName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('DnsPrefix')]"
+        }
+      }
+    },
+    {
+			"type": "Microsoft.Compute/availabilitySets",
+			"name": "[variables('adsAvailabilitySetName')]",
+			"apiVersion": "2015-05-01-preview",
+			"location": "[parameters('location')]"
+		},
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('sqlAvailabilitySetName')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('location')]",
+      "properties": {
+        "platformFaultDomainCount": "3",
+        "platformUpdateDomainCount": "3"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('rdsAvailabilitySetName')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('rgwAvailabilitySetName')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('webAvailabilitySetName')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('location')]"
+    },
+    {
+			"name": "[variables('virtualNetworkName')]",
+			"type": "Microsoft.Network/virtualNetworks",
+			"location": "[parameters('location')]",
+			"apiVersion": "2015-05-01-preview",
+			"properties": {
+				"addressSpace": {
+				"addressPrefixes": [
+					"[variables('virtualNetworkAddressRange')]"
+				]
+				},
+				"subnets": "[variables('subnets')]"
+			}
+		}
+		],
+	"outputs": {
+		"exampleOutput": {
+			"value": "[variables('namePrefix')]",
+			"type" : "string"
+		}
+	}
+}
