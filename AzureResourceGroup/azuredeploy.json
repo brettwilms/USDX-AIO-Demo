@@ -44,16 +44,11 @@
     "longNameSuffix": "[toLower(concat(parameters('nameSpace'),parameters('solution'),parameters('id')))]",
     "loc": "[toLower(replace(parameters('location'),' ',''))]"
   },
-  "resources": [
-
-  ],
-  "outputs": {
-    "O1": {
-      "value": "[variables('loc')]",
-      "type": "string"
-    },
-    "O2": { 
- 			"value": "[variables('longNameSuffix')]", 
+  "resources": [], 
+ 	"outputs": { 
+ 		"exampleOutput": { 
+ 			"value": "[variables('loc')]", 
  			"type" : "string" 
-      }
-}
+ 		} 
+ 	} 
+ } 
