@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $templateFile = '.\azuredeploy.json'
 $ResourceGroupName = "bwdx1"
-$Location = "East US"
+$Location = "East US 2"
 
 write-verbose "Gathering credentials"
 if ($null -eq $CredentialsToSetInsideVM)
