@@ -50,7 +50,7 @@
         "description": "The NetBIOS name of the domain to create"
       }
     },
-     "storageAccountType": {
+    "storageAccountType": {
       "type": "string",
       "allowedValues": [
         "Standard_LRS",
@@ -247,7 +247,8 @@
       "type": "Microsoft.Network/loadBalancers",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('pipName'))]"
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('pipName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "properties": {
         "frontendIPConfigurations": [
@@ -457,7 +458,8 @@
       "name": "[concat(variables('adsVMNamePrefix'), '1-nic')]",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/',variables('elbName'))]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -490,7 +492,8 @@
       "name": "[concat(variables('adsVMNamePrefix'), '2-nic')]",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/',variables('elbName'))]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -528,7 +531,7 @@
         "count": "[variables('sqlVMCount')]"
       },
       "dependsOn": [
-        "[variables('virtualNetworkName')]",
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]"
       ],
       "properties": {
@@ -554,7 +557,9 @@
       "name": "[concat(variables('sqlVMNamePrefix'), 'W-nic')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[variables('location')]",
-      "dependsOn": [ "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]" ],
+      "dependsOn": [
+                      "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]" 
+                    ],
       "apiVersion": "2015-05-01-preview",
       "properties": {
         "ipConfigurations": [
@@ -679,7 +684,7 @@
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('adsAvailabilitySetName'))]"
         },
         "osProfile": {
-          "computername": "[concat(variables('namePrefix'), '0')]",
+          "computername": "[concat(variables('adsVMNamePrefix'), '1')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -778,7 +783,7 @@
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(variables('adsVMNamePrefix'), '2')]",
-      "location":"[variables('location')]",
+      "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts',concat(variables('namePrefix'), '1'))]",
         "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('adsVMNamePrefix'), '2-nic'))]",
@@ -834,35 +839,35 @@
         }
       },
       "resources": [
-          {
-			      "type": "Microsoft.Compute/virtualMachines/extensions",
-			      "name": "[concat(variables('adsVMNamePrefix'),'2/CreateBDC')]",
-			      "apiVersion": "2015-05-01-preview",
-			      "location": "[variables('location')]",
-			      "dependsOn":[
-              "[concat('Microsoft.Compute/virtualMachines/', variables('adsVMNamePrefix'), '2')]"
-			      ],
-			      "properties": {
-				      "publisher": "Microsoft.Powershell",
-				      "type": "DSC",
-				      "typeHandlerVersion": "1.7",
-				      "settings": {
-					      "modulesUrl": "[variables('adBDCModulesURL')]",
-					      "configurationFunction": "[variables('adBDCConfigurationFunction')]",
-					      "properties": {
-						      "domainName": "[parameters('domainDNS')]",
-						      "adminCreds":{
-							      "userName": "[parameters('adminUserName')]",
-							      "password": "PrivateSettingsRef:adminPassword"
-						      }
-					      }
-				      },
-				      "protectedSettings": {
-					      "items": {
-						      "adminPassword": "[parameters('adminPassword')]"
-					      }
-				      }
-			      }
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(variables('adsVMNamePrefix'),'2/CreateBDC')]",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('adsVMNamePrefix'), '2')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "1.7",
+            "settings": {
+              "modulesUrl": "[variables('adBDCModulesURL')]",
+              "configurationFunction": "[variables('adBDCConfigurationFunction')]",
+              "properties": {
+                "domainName": "[parameters('domainDNS')]",
+                "adminCreds": {
+                  "userName": "[parameters('adminUserName')]",
+                  "password": "PrivateSettingsRef:adminPassword"
+                }
+              }
+            },
+            "protectedSettings": {
+              "items": {
+                "adminPassword": "[parameters('adminPassword')]"
+              }
+            }
+          }
         }
       ]
     }

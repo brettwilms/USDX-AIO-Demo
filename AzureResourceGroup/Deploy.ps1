@@ -4,7 +4,7 @@ Switch-AzureMode -Name AzureResourceManager
 $VerbosePreference = "Continue"                     # set to SilentlyContinue to suppress output
 $templateFile = '.\azuredeploy.json'
 $ResourceGroupName = "bwdx1"
-$Location = "West US"
+$Location = "East US"
 
 write-verbose "Gathering credentials"
 if ($null -eq $CredentialsToSetInsideVM)
