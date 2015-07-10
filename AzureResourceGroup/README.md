@@ -7,17 +7,24 @@ This template will create a demo environment for USDX:
 +	One external and one internal load balancer
 +	Two Domain Controllers in an availability set.
 +	Three VMs in a Windows Server Cluster:
-++ 	Two VMs run SQL Server 2014 with an availability group
-++	The third is a File Share Witness for the Cluster
+	+ 	Two VMs run SQL Server 2014 with an availability group
+	+	The third is a File Share Witness for the Cluster
+	+	The SQL availability group is configured with 3 fault domains and 3 update domains
 +	A number of load balanced web servers in an availability set
 +	A number of load Remote Desktop gateway servers in an availability set
 +	A number of Remote Desktop Session Host servers in an availability set
 
 The external load balancer includes
 +	Two RDP NAT rules to allow connectivity to the two domain controllers (port 50001 and 50002).
-+	An Inbound load balanced rule on tcp port 80 to the web servers with client affinity = none and an HTTP probe to /
-+	An Inbound load balanced rule on tcp port 443 to the Remote Desktop Gateway servers with client affinity = SourceIP and a TCP probe to port 443
-+	An Inbound load balanced rule on udp port 3391 to the Remote Desktop Gateway servers with client affinity = SourceIP and a TCP probe to port 443
++	An Inbound load balanced rule on tcp port 80 to the web servers 
+	+	Client affinity = none 
+	+	HTTP probe = /
++	An Inbound load balanced rule on tcp port 443 to the Remote Desktop Gateway servers
+	+	Client affinity = SourceIP
+	+	TCP probe to port 443
++	An Inbound load balanced rule on udp port 3391 to the Remote Desktop Gateway servers
+	+	Client affinity = SourceIP 
+	+	TCP probe to port 443
 
 A SQL Server always on listener is created using the internal load balancer with the recommended configuration.
 
