@@ -9,13 +9,13 @@
       },
       "defaultValue": "https://raw.githubusercontent.com/brettwilms/USDX-AIO-Demo/master/AzureResourceGroup"
     },
-    "adminPassword": {
+    "AdminPassword": {
       "type": "securestring",
       "metadata": {
         "description": "The password for the Administrator account of the new VMs and Domain"
       }
     },
-    "adminUsername": {
+    "AdminUserName": {
       "type": "string",
       "metadata": {
         "description": "The name of the Administrator of the new VMs and Domain"
@@ -558,8 +558,8 @@
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[variables('location')]",
       "dependsOn": [
-                      "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]" 
-                    ],
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ],
       "apiVersion": "2015-05-01-preview",
       "properties": {
         "ipConfigurations": [
@@ -685,8 +685,8 @@
         },
         "osProfile": {
           "computername": "[concat(variables('adsVMNamePrefix'), '1')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "AdminUserName": "[parameters('AdminUserName')]",
+          "AdminPassword": "[parameters('AdminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -743,14 +743,14 @@
               "properties": {
                 "domainName": "[parameters('domainDNS')]",
                 "adminCreds": {
-                  "userName": "[parameters('adminUserName')]",
-                  "password": "PrivateSettingsRef:adminPassword"
+                  "userName": "[parameters('AdminUserName')]",
+                  "password": "PrivateSettingsRef:AdminPassword"
                 }
               }
             },
             "protectedSettings": {
               "items": {
-                "adminPassword": "[parameters('adminPassword')]"
+                "AdminPassword": "[parameters('AdminPassword')]"
               }
             }
           }
@@ -799,8 +799,8 @@
         },
         "osProfile": {
           "computername": "[concat(variables('adsVMNamePrefix'), '2')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "AdminUserName": "[parameters('AdminUserName')]",
+          "AdminPassword": "[parameters('AdminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -857,25 +857,51 @@
               "properties": {
                 "domainName": "[parameters('domainDNS')]",
                 "adminCreds": {
-                  "userName": "[parameters('adminUserName')]",
-                  "password": "PrivateSettingsRef:adminPassword"
+                  "userName": "[parameters('AdminUserName')]",
+                  "password": "PrivateSettingsRef:AdminPassword"
                 }
               }
             },
             "protectedSettings": {
               "items": {
-                "adminPassword": "[parameters('adminPassword')]"
+                "AdminPassword": "[parameters('AdminPassword')]"
               }
             }
           }
         }
       ]
-    }
+    },
+    {
+			"name": "UpdateVNetDNS2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2015-01-01",
+			"dependsOn": [
+				"[concat('Microsoft.Compute/virtualMachines/',variables('adsVMNamePrefix'),'2/extensions/CreateBDC')]"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+				  "uri": "[variables('vnetwithDNSTemplateUri')]",
+				  "contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"location": {"value":"[variables('location')]"},
+					"virtualNetworkName": {"value":"[variables('virtualNetworkName')]"},
+					"virtualNetworkAddressRange": {"value":"[variables('virtualNetworkAddressRange')]"},
+					"subnets": {"value":"[variables('subnets')]"},
+					"dnsServerAddress": {"value":["[variables('adPDCNicIPAddress')]","[variables('adBDCNicIPAddress')]"]}
+				}
+			}
+		}
   ],
-	"outputs": {
-		"exampleOutput": {
-			"value": "[variables('namePrefix')]",
+  "outputs": {
+    "AdminUserName": {
+      "value": "[parameters('AdminUserName')]",
+      "type": "string"
+    },
+    "AdminPassword": {
+			"value": "[parameters('AdminPassword')]",
 			"type" : "string"
 		}
-	}
+  }
 }
