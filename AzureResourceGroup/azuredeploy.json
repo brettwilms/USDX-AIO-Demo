@@ -35,26 +35,44 @@
     "adBDCNicIPAddress": "10.0.3.5",
     "adPDCNicIPAddress": "10.0.3.4",
     "adsAvailabilitySetName": "[concat(variables('namePrefix'),'ads')]",
+    "dcVMNamePrefix": "DC",
+    "elbBackendPool1ID": "[concat(variables('elbID'),'/backendAddressPools/BackendPool1')]",
+    "elbBackendPool2ID": "[concat(variables('elbID'),'/backendAddressPools/BackendPool2')]",
+    "elbBackendPool3ID": "[concat(variables('elbID'),'/backendAddressPools/BackendPool3')]",
+    "elbFrontEndIPConfigID": "[concat(variables('elbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
     "elbID": "[resourceId('Microsoft.Network/loadBalancers',variables('elbName'))]",
     "elbName": "[concat(variables('namePrefix'),'elb')]",
+    "elbProbe1ID": "[concat(variables('elbID'),'/probes/tcpProbe1')]",
+    "elbProbe2ID": "[concat(variables('elbID'),'/probes/tcpProbe2')]",
     "ilbID": "[resourceId('Microsoft.Network/loadBalancers',variables('ilbName'))]",
     "ilbIPAddress": "10.0.2.7",
     "ilbName": "[concat(variables('namePrefix'),'ilb')]",
     "loc": "[tolower(replace(parameters('location'),' ', ''))]",
     "namePrefix": "[concat(parameters('Namespace'), variables('loc'))]",
-    "natRDP": "RDP",
+    "natRDP": "Management_RDP",
+    "natSSL": "RD_Gateway_SSL",
+    "natUDP": "RD_Gateway_UDP",
+    "pipID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]",
     "pipName": "[concat(variables('namePrefix'),'ip')]",
-    "portHTTP": "80",
-    "portRDP": "3389",
-    "portSSL": "443",
-    "portUDP": "3391",
+    "portHTTP": 80,
+    "portRDP": 3389,
+    "portSSL": 443,
+    "portUDP": 3391,
+    "rdgVMCount": 2,
+    "rdgVMNamePrefix": "GW",
     "rdsAvailabilitySetName": "[concat(variables('namePrefix'),'rds')]",
+    "rdsVMCount": 2,
+    "rdsVMNamePrefix": "RDS",
     "rgwAvailabilitySetName": "[concat(variables('namePrefix'),'rgw')]",
     "sqlAvailabilitySetName": "[concat(variables('namePrefix'),'sql')]",
+    "sqlVMCount": 2,
+    "sqlVMNamePrefix": "SQL",
     "storageAccountType": "Standard_LRS",
     "subnetApplication": "Application",
+    "subnetApplicationRef": "[concat(variables('vnetID'),'/subnets/',variables ('subnetApplication'))]",
     "subnetData": "Data",
     "subnetDataRef": "[concat(variables('vnetID'),'/subnets/',variables ('subnetData'))]",
+    "subnetFrontRef": "[concat(variables('vnetID'),'/subnets/',variables ('subnetFront'))]",
     "subnetFront": "Presentation",
     "subnetManagement": "Management",
     "subnetManagementRef": "[concat(variables('vnetID'),'/subnets/',variables ('subnetManagement'))]",
@@ -91,7 +109,9 @@
     "virtualNetworkAddressRange": "10.0.0.0/16",
     "virtualNetworkName": "[concat(variables('namePrefix'),'vnet')]",
     "vNetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    "webAvailabilitySetName": "[concat(variables('namePrefix'),'web')]"
+    "webAvailabilitySetName": "[concat(variables('namePrefix'),'web')]",
+    "webVMCount": 2,
+    "webVMNamePrefix": "WEB"
   },
   "resources": [
     {
@@ -168,45 +188,148 @@
       }
     },
     {
-      "apiVersion": "2015-05-01-preview",
-      "name": "[variables('elbName')]",
-      "type": "Microsoft.Network/loadBalancers",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]"
-      ],
-      "properties": {
-        "frontendIPConfigurations": [
-          {
-            "name": "elbFrontEnd",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[variables('elbName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('pipName'))]"
+            ],
             "properties": {
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]"
-              }
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LoadBalancerFrontEnd",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[variables('pipID')]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                  {
+                    "name": "BackendPool1"
+
+                  },
+                  {
+                    "name": "BackendPool2"
+
+                  },
+                  {
+                        "name": "BackendPool3"
+
+                    }
+                ],
+                "inboundNatRules": [
+                    {
+                        "name": "RDP0",
+                        "properties": {
+                            "frontendIPConfiguration":
+                                {
+                                    "id": "[variables('elbFrontEndIPConfigID')]"
+                                },
+                            "protocol": "tcp",
+                            "frontendPort": 50001,
+                            "backendPort": 3389,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "RDP1",
+                        "properties": {
+                            "frontendIPConfiguration":
+                                {
+                                    "id": "[variables('elbFrontEndIPConfigID')]"
+                                },
+                            "protocol": "tcp",
+                            "frontendPort": 50002,
+                            "backendPort": 3389,
+                            "enableFloatingIP": false
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                  {
+                    "name": "LBRule1",
+                    "properties": {
+                      "frontendIPConfiguration": {
+                        "id": "[variables('elbFrontEndIPConfigID')]"
+                      },
+                      "backendAddressPool": {
+                        "id": "[variables('elbBackendPool1ID')]"
+                      },
+                      "protocol": "tcp",
+                      "frontendPort": 443,
+                      "backendPort": 443,
+                      "enableFloatingIP": false,
+                      "idleTimeoutInMinutes": 5,
+                      "loadDistribution": "SourceIP",
+                      "probe": {
+                        "id": "[variables('elbProbe1ID')]"
+                      }
+                    }
+                  },
+                  {
+                    "name": "LBRule2",
+                    "properties": {
+                      "frontendIPConfiguration": {
+                        "id": "[variables('elbFrontEndIPConfigID')]"
+                      },
+                      "backendAddressPool": {
+                        "id": "[variables('elbBackendPool1ID')]"
+                      },
+                      "protocol": "udp",
+                      "frontendPort": 3391,
+                      "backendPort": 3391,
+                      "enableFloatingIP": false,
+                      "loadDistribution": "SourceIP",
+                      "probe": {
+                        "id": "[variables('elbProbe1ID')]"
+                      }
+                    }
+                  },
+                  {
+                        "name": "LBRule3",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('elbFrontEndIPConfigID')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[variables('elbBackendPool3ID')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "loadDistribution": "Default",
+                            "probe": {
+                                "id": "[variables('elbProbe2ID')]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                  {
+                    "name": "tcpProbe1",
+                    "properties": {
+                      "protocol": "tcp",
+                      "port": 443,
+                      "intervalInSeconds": "5",
+                      "numberOfProbes": "2"
+                    }
+                  },
+                  {
+                        "name": "tcpProbe2",
+                        "properties": {
+                            "protocol": "tcp",
+                            "port": 80,
+                            "intervalInSeconds": "5",
+                            "numberOfProbes": "2"
+                        }
+                    }
+                ]
             }
-          }
-        ],
-        "backendAddressPools": [
-          {
-            "name": "elbBackEndPool"
-          }
-        ],
-        "inboundNatRules": [
-          {
-            "name": "[variables('natRDP')]",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('elbName')), '/frontendIpConfigurations/elbFrontend')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": "[variables('portRDP')]",
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          }
-        ]
-      }
-    },
+        },
     {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/loadBalancers",
@@ -229,7 +352,7 @@
         ],
         "backendAddressPools": [
           {
-            "name": "ilbBackendPool"
+            "name": "sqlBackendPool"
           }
         ],
         "loadBalancingRules": [
@@ -239,7 +362,7 @@
                 "Id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('ilbName')), '/frontendIpConfigurations/ilbFrontend')]"
               },
               "backendAddressPool": {
-                "Id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('ilbName')), '/backendAddressPools/ilbBackendPool')]"
+                "Id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('ilbName')), '/backendAddressPools/sqlBackendPool')]"
               },
               "probe": {
                 "Id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('ilbName')), '/probes/sqlProbe')]"
@@ -267,38 +390,214 @@
       }
     },
     {
-            "apiVersion": "2015-05-01-preview",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(variables('namePrefix'), 'pdcnic')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]"
-            ],
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('dcVMNamePrefix'), '1-nic')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
             "properties": {
-                "ipConfigurations": [{
-                    "name": "ipconfig1",
-                    "properties": {
-                      "privateIPAllocationMethod": "Static",
-                      "privateIPAddress" :"[variables('adPDCNicIPAddress')]",
-                      "subnet": {
-                        "id": "[variables('subnetManagementRef')]"
-                      },
-							"loadBalancerBackendAddressPools": [
-								{
-									"id": "[concat(variables('elbID'), '/backendAddressPools/elbBackendPool')]"
-								}
-							],
-							"loadBalancerInboundNatRules": [
-								{
-									"id": "[concat(variables('elbID'),'/inboundNatRules/',variables('natRDP'))]"
-								}
-							]
-                    }
-                }]
-
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('adPDCNicIPAddress')]",
+              "subnet": {
+                "id": "[variables('subnetManagementRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                            {
+                                "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool2')]"
+                            }
+                        ],
+              "loadBalancerInboundNatRules": [
+                            {
+                                "id": "[concat(variables('elbID'),'/inboundNatRules/RDP0')]"
+                            }
+                        ]
             }
-        }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('dcVMNamePrefix'), '2-nic')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('adBDCNicIPAddress')]",
+              "subnet": {
+                "id": "[variables('subnetManagementRef')]"
+              },
+                            "loadBalancerBackendAddressPools": [
+                            {
+                                "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool2')]"
+                            }
+                        ],
+              "loadBalancerInboundNatRules": [
+                            {
+                                "id": "[concat(variables('elbID'),'/inboundNatRules/RDP1')]"
+                            }
+                        ]
+            }
+          }
+        ]
+
+      }
+    },
+    {
+      "name": "[concat(variables('sqlVMNamePrefix'), copyindex(),'-nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-05-01-preview",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[variables('sqlVMCount')]"
+      },
+      "dependsOn": [
+        "[variables('virtualNetworkName')]",
+        "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetDataRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(variables('ilbID'), '/backendAddressPools/sqlBackendPool')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[concat(variables('sqlVMNamePrefix'), 'W-nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "dependsOn": [],
+      "apiVersion": "2015-05-01-preview",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetDataRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[concat(variables('rdsVMNamePrefix'), copyindex(),'-nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-05-01-preview",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[variables('rdsVMCount')]"
+      },
+      "dependsOn": [
+        "[variables('virtualNetworkName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetApplicationRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[concat(variables('rdgVMNamePrefix'), copyindex(),'-nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-05-01-preview",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[variables('rdgVMCount')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetApplicationRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool1')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[concat(variables('webVMNamePrefix'), copyindex(),'-nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "apiVersion": "2015-05-01-preview",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[variables('webVMCount')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('subnetFrontRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                            {
+                                "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool3')]"
+                            }
+                        ]
+            }
+          }
+        ]
+      }
+    }
 		],
 	"outputs": {
 		"exampleOutput": {
