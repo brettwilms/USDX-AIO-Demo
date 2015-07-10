@@ -5,24 +5,34 @@ This template will create a demo environment for USDX:
 +	A Virtual Network
 +	Six Storage Accounts
 +	One external and one internal load balancer
-+	Two VMs configured as Domain Controllers for a new forest with a single domain
++	Two Domain Controllers in an availability set.
 +	Three VMs in a Windows Server Cluster, two VMs run SQL Server 2014 with an availability group and the third is a File Share Witness for the Cluster
-+	Two Availability Sets one for the AD VMs, the other for the SQL and Witness VMs, the second Availability Set is configured with three Update Domains and three Fault Domains
++	A number of load balanced web servers in an availability set
++	A number of load Remote Desktop gateway servers in an availability set
++	A number of Remote Desktop Session Host servers in an availability set
 
-The external load balancer creates an RDP NAT rule to allow connectivity to the first VM created, in order to access other VMs in the deployment this VM should be used as a jumpbox.
+The external load balancer includes
++	Two RDP NAT rules to allow connectivity to the two domain controllers (port 50001 and 50002).
++	An Inbound load balanced rule on tcp port 80 to the web servers with client affinity = none and an HTTP probe to /
++	An Inbound load balanced rule on tcp port 443 to the Remote Desktop Gateway servers with client affinity = SourceIP and a TCP probe to port 443
++	An Inbound load balanced rule on udp port 3391 to the Remote Desktop Gateway servers with client affinity = SourceIP and a TCP probe to port 443
 
-A SQL Server always on listener is created using the internal load balancer.
+A SQL Server always on listener is created using the internal load balancer with the recommended configuration.
 
 # Known Issues
 
-This template is entirely serial due to some issues between the platform agent and the DSC extension which cause problems when multiple VM and\or extension resources are deployed concurrently. This issue will be fixed as soon as possible.
+This template is largely serial due to some issues between the platform agent and the DSC extension which cause problems when multiple VM and\or extension resources are deployed concurrently. 
+This issue will be fixed as soon as possible.
 
 ## Notes
 
 + 	The images used to create this deployment are
 	+ 	AD - Latest Windows Server 2012 R2 Image
+	+ 	RD Gateway - Latest Windows Server 2012 R2 Image
+	+ 	RD Session Host - Latest Windows Server 2012 R2 Image
 	+ 	SQL Server - Latest SQL Server 2014 on Windows Server 2012 R2 Image
-	+ 	Witness - Latest Windows Server 2012 R2 Image
+	+ 	SQL Witness - Latest Windows Server 2012 R2 Image
+	+ 	Web - Latest Windows Server 2012 R2 Image
 
 + 	The image configuration is defined in variables - details below - but the scripts that configure this deployment have only been tested with these versions and may not work on other images.
 
@@ -59,24 +69,19 @@ New-AzureResourceGroup -Name "<new resourcegroup name>" -Location "<new resource
 
 |Name|Description                                        |
 |:----|:-------------------------------------------------|
-|Namespace|The namespace for the solution|
-|location|Location where to deploy the resource <ul>**Allowed Values**<li>West US **(default)**</li><li>East US</li><li>West Europe</li><li>East Asia</li><li>Southeast Asia</li>|
+|DnsPrefix|The DNS prefix for the public IP of the solution - Defaults to the resource group name|
+|Namespace|The namespace for the solution - Defaults to the resource group name|
+|location|Location where to deploy the resource <ul>**Allowed Values**<li>West US</li><li>East US **(default)**</li><li>West Europe</li><li>East Asia</li><li>Southeast Asia</li>|
 
 
 ## Notable Variables
 
 |Name|Description|
 |:---|:---------------------|
-|virtualNetworkName|Name of the Virtual Network|
-|rdpPort|The public RDP port for first VM|
-|windowsImagePublisher|The name of the pulisher of the AD and Witness Image|
-|windowsImageOffer|The Offer Name for the Image used by AD and Witness VMs|
-|windowsImageSKU|The Image SKU for the AD and Witness Image|
-|sqlImagePublisher|The name of the pulisher of the SQL Image|
-|sqlImageOffer|The Offer Name for the Image used by SQL|
-|sqlImageSKU|The Image SKU for the SQL Image|
-|domainName|The name of the new AD Domain created|
-
+|TBD|TBD|
+|TBD|TBD|
+|TBD|TBD|
+|TBD|TBD|
 
 
 
