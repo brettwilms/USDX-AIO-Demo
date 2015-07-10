@@ -44,6 +44,7 @@
     "elbName": "[concat(variables('namePrefix'),'elb')]",
     "elbProbe1ID": "[concat(variables('elbID'),'/probes/tcpProbe1')]",
     "elbProbe2ID": "[concat(variables('elbID'),'/probes/tcpProbe2')]",
+    "elbProbe3ID": "[concat(variables('elbID'),'/probes/httpProbe1')]",
     "ilbID": "[resourceId('Microsoft.Network/loadBalancers',variables('ilbName'))]",
     "ilbIPAddress": "10.0.2.7",
     "ilbName": "[concat(variables('namePrefix'),'ilb')]",
@@ -303,7 +304,7 @@
                             "enableFloatingIP": false,
                             "loadDistribution": "Default",
                             "probe": {
-                                "id": "[variables('elbProbe2ID')]"
+                                "id": "[variables('elbProbe3ID')]"
                             }
                         }
                     }
@@ -319,14 +320,24 @@
                     }
                   },
                   {
-                        "name": "tcpProbe2",
-                        "properties": {
-                            "protocol": "tcp",
-                            "port": 80,
-                            "intervalInSeconds": "5",
-                            "numberOfProbes": "2"
-                        }
+                    "name": "tcpProbe2",
+                    "properties": {
+                      "protocol": "tcp",
+                      "port": 80,
+                      "intervalInSeconds": "5",
+                      "numberOfProbes": "2"
                     }
+                  },
+                  {
+                    "name": "httpProbe1",
+                    "properties": {
+                      "protocol": "Http",
+                      "port": 80,
+                      "requestPath": "/",
+                      "intervalInSeconds": 5,
+                      "numberOfProbes": 2
+                    }
+                  }
                 ]
             }
         },
