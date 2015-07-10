@@ -2,6 +2,8 @@
 Switch-AzureMode -Name AzureResourceManager
 
 $VerbosePreference = "Continue"                     # set to SilentlyContinue to suppress output
+$ErrorActionPreference = "Stop"
+
 $templateFile = '.\azuredeploy.json'
 $ResourceGroupName = "bwdx1"
 $Location = "East US"
@@ -22,4 +24,9 @@ if($null -eq $rg)
 $params = @{adminUserName=$CredentialsToSetInsideVM.UserName;adminPassword=$CredentialsToSetInsideVM.GetNetworkCredential().Password}
 New-AzureResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $templateFile -TemplateParameterObject $params
 
+<#
 
+Get-AzureResourceGroup -Name $ResourceGroupName | ft
+Remove-AzureResourceGroup -Name $ResourceGroupName -Force
+
+#>
