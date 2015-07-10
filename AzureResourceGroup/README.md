@@ -6,7 +6,9 @@ This template will create a demo environment for USDX:
 +	Six Storage Accounts
 +	One external and one internal load balancer
 +	Two Domain Controllers in an availability set.
-+	Three VMs in a Windows Server Cluster, two VMs run SQL Server 2014 with an availability group and the third is a File Share Witness for the Cluster
++	Three VMs in a Windows Server Cluster:
+++ 	Two VMs run SQL Server 2014 with an availability group
+++	The third is a File Share Witness for the Cluster
 +	A number of load balanced web servers in an availability set
 +	A number of load Remote Desktop gateway servers in an availability set
 +	A number of Remote Desktop Session Host servers in an availability set
