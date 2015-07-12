@@ -504,7 +504,8 @@
       "location": "[variables('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/',variables('elbName'))]"
+        "[concat('Microsoft.Network/loadBalancers/',variables('elbName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "ipConfigurations": [
@@ -539,7 +540,8 @@
       "apiVersion": "2015-05-01-preview",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]"
+        "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS2"
       ],
       "properties": {
         "ipConfigurations": [
@@ -567,7 +569,8 @@
       "apiVersion": "2015-05-01-preview",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]"
+        "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS2"
       ],
       "properties": {
         "ipConfigurations": [
@@ -593,7 +596,8 @@
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS2"
       ],
       "apiVersion": "2015-05-01-preview",
       "properties": {
@@ -620,7 +624,8 @@
         "count": "[variables('rdsVMCount')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS2"
       ],
       "properties": {
         "ipConfigurations": [
@@ -647,7 +652,8 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]"
+        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS2"
       ],
       "properties": {
         "ipConfigurations": [
@@ -679,7 +685,8 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]"
+        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS2"
       ],
       "properties": {
         "ipConfigurations": [

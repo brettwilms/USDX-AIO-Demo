@@ -1,12 +1,18 @@
 ﻿Set-Location "C:\Users\brettwil\Documents\GitHub\USDX-AIO-Demo\AzureResourceGroup"
 Switch-AzureMode -Name AzureResourceManager
 
+
 $VerbosePreference = "Continue"                     # set to SilentlyContinue to suppress output
 $ErrorActionPreference = "Stop"
 
 $templateFile = '.\azuredeploy.json'
-$ResourceGroupName = "bdx3"
+$ResourceGroupName = "bdx1"
+$SubscriptionName = 'bwdx-demo'
 $Location = "East US 2"
+
+
+Select-AzureSubscription -SubscriptionName $SubscriptionName
+Select-AzureSubscription -SubscriptionName $SubscriptionName -Current
 
 write-verbose "Gathering credentials"
 if ($null -eq $CredentialsToSetInsideVM)
@@ -26,6 +32,7 @@ New-AzureResourceGroupDeployment -ResourceGroupName $ResourceGroupName -Template
 
 <#
 
+Get-AzureVMUsage -Location $Location
 Get-AzureResourceGroup -Name $ResourceGroupName | ft
 Remove-AzureResourceGroup -Name $ResourceGroupName -Force
 
