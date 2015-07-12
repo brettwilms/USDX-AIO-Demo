@@ -51,21 +51,25 @@
       }
     },
     "storageAccountType": {
-      "type": "string",
       "allowedValues": [
         "Standard_LRS",
         "Standard_GRS",
         "Standard_RAGRS",
         "Premium_LRS"
       ],
+      "defaultValue": "Premium_LRS",
       "metadata": {
         "description": "The type of the Storage Account created"
       },
-      "defaultValue": "Premium_LRS"
-    },
+      "type": "string"
+    }
   },
   "variables": {
-    "_vmDiskSize": 127,
+    "_adsVMSize": "Standard_DS2",
+    "_sqlDataDiskSize": 127,
+    "_sqlVMSize": "Standard_DS2",
+    "_vmDataDiskSize": 127,
+    "_witnessVMSize": "Standard_DS1",
     "adBDCConfigurationFunction": "CreateADBDC.ps1\\CreateADBDC",
     "adBDCModulesURL": "[concat(parameters('assetLocation'),'/CreateADBDC.ps1.zip')]",
     "adBDCNicIPAddress": "10.0.3.5",
@@ -74,7 +78,6 @@
     "adPDCNicIPAddress": "10.0.3.4",
     "adsAvailabilitySetName": "[concat(variables('namePrefix'),'ads')]",
     "adsVMNamePrefix": "DC",
-    "adsVMSize": "Standard_DS2",
     "clusterName": "[concat(variables('sqlVMNamePrefix'),'-fc')]",
     "createClusterConfigurationFunction": "CreateFailoverCluster.ps1\\CreateFailoverCluster",
     "createClusterModulesURL": "[concat(parameters('assetLocation'),'/CreateFailoverCluster.ps1.zip')]",
@@ -107,11 +110,11 @@
     "portUDP": 3391,
     "rdgVMCount": 2,
     "rdgVMNamePrefix": "GW",
-    "rdgVMSize": "Standard_DS2",
+    "rdgVMSize": "Medium",
     "rdsAvailabilitySetName": "[concat(variables('namePrefix'),'rds')]",
     "rdsVMCount": 2,
     "rdsVMNamePrefix": "RDS",
-    "rdsVMSize": "Standard_DS2",
+    "rdsVMSize": "Medium",
     "rgwAvailabilitySetName": "[concat(variables('namePrefix'),'rgw')]",
     "sharePath": "[concat(variables('namePrefix'),'-fsw')]",
     "sqlAOAGName": "[concat(variables('sqlVMNamePrefix'),'-ag')]",
@@ -120,13 +123,11 @@
     "sqlAOPrepareConfigurationFunction": "PrepareAlwaysOnSqlServer.ps1\\PrepareAlwaysOnSqlServer",
     "sqlAOPrepareModulesURL": "[concat(parameters('assetLocation'),'/PrepareAlwaysOnSqlServer.ps1.zip')]",
     "sqlAvailabilitySetName": "[concat(variables('namePrefix'),'sql')]",
-    "sqlDiskSize": 127,
     "sqlImageOffer": "SQL2014-WS2012R2",
     "sqlImagePublisher": "MicrosoftSQLServer",
     "sqlImageSKU": "Enterprise",
     "sqlVMCount": 2,
     "sqlVMNamePrefix": "SQL",
-    "sqlVMSize": "Standard_DS2",
     "subnetApplication": "Application",
     "subnetApplicationRef": "[concat(variables('vnetID'),'/subnets/',variables ('subnetApplication'))]",
     "subnetData": "Data",
@@ -172,11 +173,10 @@
     "webAvailabilitySetName": "[concat(variables('namePrefix'),'web')]",
     "webVMCount": 2,
     "webVMNamePrefix": "WEB",
-    "webVMSize": "Standard_DS2",
+    "webVMSize": "Medium",
     "windowsImageOffer": "WindowsServer",
     "windowsImagePublisher": "MicrosoftWindowsServer",
-    "windowsImageSKU": "2012-R2-Datacenter",
-    "witnessVMSize": "Standard_DS1"
+    "windowsImageSKU": "2012-R2-Datacenter"
   },
   "resources": [
     {
@@ -713,7 +713,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('adsVMSize')]"
+          "vmSize": "[variables('_adsVMSize')]"
         },
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('adsAvailabilitySetName'))]"
@@ -746,7 +746,7 @@
               "name": "[concat(variables('adsVMNamePrefix'),'1-data-disk0')]",
               "createOption": "empty",
               "caching": "None",
-              "diskSizeGB": "[variables('_vmDiskSize')]",
+              "diskSizeGB": "[variables('_vmDataDiskSize')]",
               "lun": 0
             }
           ]
@@ -827,7 +827,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('adsVMSize')]"
+          "vmSize": "[variables('_adsVMSize')]"
         },
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('adsAvailabilitySetName'))]"
@@ -860,7 +860,7 @@
               "name": "[concat(variables('adsVMNamePrefix'),'2-data-disk1')]",
               "createOption": "empty",
               "caching": "None",
-              "diskSizeGB": "[variables('_vmDiskSize')]",
+              "diskSizeGB": "[variables('_vmDataDiskSize')]",
               "lun": 0
             }
           ]
@@ -941,7 +941,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('sqlVMSize')]"
+          "vmSize": "[variables('_sqlVMSize')]"
         },
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('sqlAvailabilitySetName'))]"
@@ -974,7 +974,7 @@
               "name": "[concat(variables('sqlVMNamePrefix'), '1-data')]",
               "caching": "None",
               "createOption": "empty",
-              "diskSizeGB": "[variables('sqlDiskSize')]",
+              "diskSizeGB": "[variables('_sqlDiskSize')]",
               "lun": 0
             },
             {
@@ -984,7 +984,7 @@
               "name": "[concat(variables('namePrefix'),'1-log')]",
               "caching": "None",
               "createOption": "empty",
-              "diskSizeGB": "[variables('sqlDiskSize')]",
+              "diskSizeGB": "[variables('_sqlDiskSize')]",
               "lun": 1
             }
           ]
@@ -1050,7 +1050,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('sqlVMSize')]"
+          "vmSize": "[variables('_sqlVMSize')]"
         },
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('sqlAvailabilitySetName'))]"
@@ -1083,7 +1083,7 @@
               "name": "[concat(variables('sqlVMNamePrefix'), '2-data')]",
               "caching": "None",
               "createOption": "empty",
-              "diskSizeGB": "[variables('sqlDiskSize')]",
+              "diskSizeGB": "[variables('_sqlDiskSize')]",
               "lun": 0
             },
             {
@@ -1093,7 +1093,7 @@
               "name": "[concat(variables('namePrefix'),'2-log')]",
               "caching": "None",
               "createOption": "empty",
-              "diskSizeGB": "[variables('sqlDiskSize')]",
+              "diskSizeGB": "[variables('_sqlDiskSize')]",
               "lun": 1
             }
           ]
@@ -1171,7 +1171,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[variables('witnessVMSize')]"
+          "vmSize": "[variables('_witnessVMSize')]"
         },
         "availabilitySet": {
           "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('sqlAvailabilitySetName'))]"
@@ -1204,7 +1204,7 @@
               "name": "[concat(variables('sqlVMNamePrefix'),'W-data')]",
               "caching": "None",
               "createOption": "empty",
-              "diskSizeGB": "[variables('_vmDiskSize')]",
+              "diskSizeGB": "[variables('_vmDataDiskSize')]",
               "lun": 0
             }
           ]

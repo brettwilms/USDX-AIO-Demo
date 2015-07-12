@@ -5,7 +5,7 @@ $VerbosePreference = "Continue"                     # set to SilentlyContinue to
 $ErrorActionPreference = "Stop"
 
 $templateFile = '.\azuredeploy.json'
-$ResourceGroupName = "bwdx1"
+$ResourceGroupName = "bdx2"
 $Location = "East US 2"
 
 write-verbose "Gathering credentials"
