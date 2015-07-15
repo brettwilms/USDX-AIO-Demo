@@ -1,4 +1,4 @@
-﻿Set-Location "C:\Users\brettwil\Documents\GitHub\USDX-AIO-Demo\AzureResourceGroup"
+﻿Set-Location "C:\Users\brett\Documents\GitHub\USDX-AIO-Demo\AzureResourceGroup"
 Switch-AzureMode -Name AzureResourceManager
 
 
@@ -6,7 +6,7 @@ $VerbosePreference = "Continue"                     # set to SilentlyContinue to
 $ErrorActionPreference = "Stop"
 
 $templateFile = '.\azuredeploy.json'
-$ResourceGroupName = "bdx2"
+$ResourceGroupName = "bdx3"
 $SubscriptionName = 'bwdx-demo'
 $Location = "East US 2"
 
