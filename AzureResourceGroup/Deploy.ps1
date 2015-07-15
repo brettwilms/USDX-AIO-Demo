@@ -6,7 +6,7 @@ $VerbosePreference = "Continue"                     # set to SilentlyContinue to
 $ErrorActionPreference = "Stop"
 
 $templateFile = '.\azuredeploy.json'
-$ResourceGroupName = "bdx1"
+$ResourceGroupName = "bdx2"
 $SubscriptionName = 'bwdx-demo'
 $Location = "East US 2"
 

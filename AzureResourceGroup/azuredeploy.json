@@ -881,7 +881,10 @@
         }
       },
       "resources": [
-        {
+
+      ]
+    },
+    {
           "type": "Microsoft.Compute/virtualMachines/extensions",
           "name": "[concat(variables('adsVMNamePrefix'),'2/CreateBDC')]",
           "apiVersion": "2015-05-01-preview",
@@ -910,9 +913,7 @@
               }
             }
           }
-        }
-      ]
-    },
+        },
     {
       "name": "UpdateVNetDNS2",
       "type": "Microsoft.Resources/deployments",
@@ -1005,43 +1006,7 @@
         }
       },
       "resources": [
-        {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('sqlVMNamePrefix'),'1/sqlAOPrepare')]",
-          "apiVersion": "2015-05-01-preview",
-          "location": "[variables('location')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('sqlVMNamePrefix'),'1')]",
-            "[concat('Microsoft.Compute/virtualMachines/',variables('sqlVMNamePrefix'),'W/extensions/CreateFileShareWitness')]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Powershell",
-            "type": "DSC",
-            "typeHandlerVersion": "1.7",
-            "settings": {
-              "modulesUrl": "[variables('sqlAOPrepareModulesURL')]",
-              "configurationFunction": "[variables('sqlAOPrepareConfigurationFunction')]",
-              "properties": {
-                "domainName": "[parameters('domainDNS')]",
-                "sqlAlwaysOnEndpointName": "[variables('sqlAOEPName')]",
-                "adminCreds": {
-                  "userName": "[parameters('adminUserName')]",
-                  "password": "PrivateSettingsRef:adminPassword"
-                },
-                "sqlServiceCreds": {
-                  "userName": "[parameters('adminUserName')]",
-                  "password": "PrivateSettingsRef:adminPassword"
-                }
-              }
-            },
-            "protectedSettings": {
-              "items": {
-                "adminPassword": "[parameters('adminPassword')]",
-                "sqlServerServiceAccountPassword": "[parameters('adminPassword')]"
-              }
-            }
-          }
-        }
+        
       ]
     },
     {
@@ -1114,55 +1079,7 @@
         }
       },
       "resources": [
-        {
-			    "type": "Microsoft.Compute/virtualMachines/extensions",
-			    "name": "[concat(variables('sqlVMNamePrefix'),'1/CreateCluster')]",
-			    "apiVersion": "2015-05-01-preview",
-			    "location": "[variables('location')]",
-			    "dependsOn":[
-				    "[concat('Microsoft.Compute/virtualMachines/', variables('sqlVMNamePrefix'),'2')]",
-				    "[concat('Microsoft.Compute/virtualMachines/',variables('sqlVMNamePrefix'),'1/extensions/sqlAOPrepare')]"
-			    ],
-			    "properties": {
-				    "publisher": "Microsoft.Powershell",
-				    "type": "DSC",
-				    "typeHandlerVersion": "1.7",
-				    "settings": {
-					    "modulesUrl": "[variables('createClusterModulesURL')]",
-					    "configurationFunction": "[variables('createClusterConfigurationFunction')]",
-					    "properties": {
-						    "domainName": "[parameters('domainDNS')]",
-						    "clusterName":"[variables('clusterName')]",
-						    "sharePath":"[concat('\\\\', variables('sqlVMNamePrefix'), 'W\\', variables('sharePath') )]",
-						    "nodes":["[concat(variables('sqlVMNamePrefix'),'1')]","[concat(variables('sqlVMNamePrefix'),'2')]"],
-						    "sqlAlwaysOnEndpointName":"[variables('sqlAOEPName')]",
-						    "sqlAlwaysOnAvailabilityGroupName":"[variables('sqlAOAGName')]",
-						    "sqlAlwaysOnAvailabilityGroupListenerName":"[variables('sqlAOListenerName')]",
-						    "sqlAlwaysOnAvailabilityGroupListenerPort":1433,
-						    "lbName":"[variables('ilbName')]",
-						    "lbAddress":"[variables('ilbIPAddress')]",
-						    "primaryReplica":"[concat(variables('sqlVMNamePrefix'),'2')]",
-						    "secondaryReplica":"[concat(variables('sqlVMNamePrefix'),'1')]",
-						    "databaseNames":"[variables('databaseNames')]",
-						    "dnsServerName":"[concat(variables('adsVMNamePrefix'), '1')]",
-						    "adminCreds":{
-							    "userName": "[parameters('adminUserName')]",
-							    "password": "PrivateSettingsRef:adminPassword"
-						    },
-						    "sQLServiceCreds":{
-							    "userName": "[parameters('adminUserName')]",
-							    "password": "PrivateSettingsRef:adminPassword"
-						    }
-					    }
-				    },
-				    "protectedSettings": {
-					    "items": {
-						    "adminPassword": "[parameters('adminPassword')]",
-						    "sqlServerServiceAccountPassword": "[parameters('adminPassword')]"
-					    }
-				    }
-			    }
-		    }
+        
       ]
     },
     {
@@ -1225,7 +1142,96 @@
         }
       },
       "resources": [
-        {
+        
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('sqlVMNamePrefix'),'1/sqlAOPrepare')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('sqlVMNamePrefix'),'1')]",
+        "[concat('Microsoft.Compute/virtualMachines/',variables('sqlVMNamePrefix'),'W/extensions/CreateFileShareWitness')]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "1.7",
+        "settings": {
+          "modulesUrl": "[variables('sqlAOPrepareModulesURL')]",
+          "configurationFunction": "[variables('sqlAOPrepareConfigurationFunction')]",
+          "properties": {
+            "domainName": "[parameters('domainDNS')]",
+            "sqlAlwaysOnEndpointName": "[variables('sqlAOEPName')]",
+            "adminCreds": {
+              "userName": "[parameters('adminUserName')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            },
+            "sqlServiceCreds": {
+              "userName": "[parameters('adminUserName')]",
+              "password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
+            }
+          }
+        },
+        "protectedSettings": {
+          "items": {
+            "adminPassword": "[parameters('adminPassword')]",
+            "sqlServerServiceAccountPassword": "[parameters('adminPassword')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('sqlVMNamePrefix'),'1/CreateCluster')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('sqlVMNamePrefix'),'2')]",
+        "[concat('Microsoft.Compute/virtualMachines/',variables('sqlVMNamePrefix'),'1/extensions/sqlAOPrepare')]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "1.7",
+        "settings": {
+          "modulesUrl": "[variables('createClusterModulesURL')]",
+          "configurationFunction": "[variables('createClusterConfigurationFunction')]",
+          "properties": {
+            "domainName": "[parameters('domainDNS')]",
+            "clusterName": "[variables('clusterName')]",
+            "sharePath": "[concat('\\\\', variables('sqlVMNamePrefix'), 'W\\', variables('sharePath') )]",
+            "nodes": [ "[concat(variables('sqlVMNamePrefix'),'1')]", "[concat(variables('sqlVMNamePrefix'),'2')]" ],
+            "sqlAlwaysOnEndpointName": "[variables('sqlAOEPName')]",
+            "sqlAlwaysOnAvailabilityGroupName": "[variables('sqlAOAGName')]",
+            "sqlAlwaysOnAvailabilityGroupListenerName": "[variables('sqlAOListenerName')]",
+            "sqlAlwaysOnAvailabilityGroupListenerPort": 1433,
+            "lbName": "[variables('ilbName')]",
+            "lbAddress": "[variables('ilbIPAddress')]",
+            "primaryReplica": "[concat(variables('sqlVMNamePrefix'),'2')]",
+            "secondaryReplica": "[concat(variables('sqlVMNamePrefix'),'1')]",
+            "databaseNames": "[variables('databaseNames')]",
+            "dnsServerName": "[concat(variables('adsVMNamePrefix'), '1')]",
+            "adminCreds": {
+              "userName": "[parameters('adminUserName')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            },
+            "sQLServiceCreds": {
+              "userName": "[parameters('adminUserName')]",
+              "password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
+            }
+          }
+        },
+        "protectedSettings": {
+          "items": {
+            "adminPassword": "[parameters('adminPassword')]",
+            "sqlServerServiceAccountPassword": "[parameters('adminPassword')]"
+          }
+        }
+      }
+    },
+    {
           "type": "Microsoft.Compute/virtualMachines/extensions",
           "name": "[concat(variables('sqlVMNamePrefix'),'W/CreateFileShareWitness')]",
           "apiVersion": "2015-05-01-preview",
@@ -1257,8 +1263,6 @@
             }
           }
         }
-      ]
-    }
 
   ],
   "outputs": {
