@@ -72,13 +72,13 @@
     }
   },
   "variables": {
-    "_adsVMSize": "Standard_DS2",
-    "_rdgVMSize": "Standard_DS2",
-    "_rdsVMSize": "Standard_DS2",
-    "_sqlVMSize": "Standard_DS2",
+    "_adsVMSize": "Standard_D2",
+    "_rdgVMSize": "Standard_D2",
+    "_rdsVMSize": "Standard_D2",
+    "_sqlVMSize": "Standard_D2",
     "_vmDiskSize": "[parameters('DataDiskSizeGB')]",
-    "_webVMSize": "Standard_DS2",
-    "_witnessVMSize": "Standard_DS1",
+    "_webVMSize": "Standard_D2",
+    "_witnessVMSize": "Standard_D1",
     "adBDCConfigurationFunction": "CreateADBDC.ps1\\CreateADBDC",
     "adBDCModulesURL": "[concat(parameters('assetLocation'),'/CreateADBDC.ps1.zip')]",
     "adBDCNicIPAddress": "10.0.3.5",
@@ -970,9 +970,6 @@
           "subnets": { "value": "[variables('subnets')]" },
           "dnsServerAddress": { "value": [ "[variables('adPDCNicIPAddress')]" ] }
         }
-      },
-      "tags": {
-        "Environment": "[parameters('Namespace')]"
       }
     },
     {
@@ -1094,9 +1091,6 @@
           "subnets": { "value": "[variables('subnets')]" },
           "dnsServerAddress": { "value": [ "[variables('adPDCNicIPAddress')]", "[variables('adBDCNicIPAddress')]" ] }
         }
-      },
-      "tags": {
-        "Environment": "[parameters('Namespace')]"
       }
     },
     {
