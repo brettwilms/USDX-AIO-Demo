@@ -288,7 +288,7 @@
         ],
         "inboundNatRules": [
           {
-            "name": "RDP1",
+            "name": "RDP0",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[variables('elbFrontEndIPConfigID')]"
@@ -300,97 +300,13 @@
             }
           },
           {
-            "name": "RDP2",
+            "name": "RDP1",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[variables('elbFrontEndIPConfigID')]"
               },
               "protocol": "tcp",
               "frontendPort": 50002,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP3",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50003,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP4",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50004,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP5",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50005,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP6",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50006,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP7",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50007,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP8",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50008,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP9",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50009,
               "backendPort": 3389,
               "enableFloatingIP": false
             }
@@ -573,7 +489,7 @@
               ],
               "loadBalancerInboundNatRules": [
                 {
-                  "id": "[concat(variables('elbID'),'/inboundNatRules/RDP1')]"
+                  "id": "[concat(variables('elbID'),'/inboundNatRules/RDP0')]"
                 }
               ]
             }
@@ -608,7 +524,7 @@
               ],
               "loadBalancerInboundNatRules": [
                 {
-                  "id": "[concat(variables('elbID'),'/inboundNatRules/RDP2')]"
+                  "id": "[concat(variables('elbID'),'/inboundNatRules/RDP1')]"
                 }
               ]
             }
