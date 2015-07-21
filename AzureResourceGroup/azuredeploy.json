@@ -668,7 +668,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "ipConfigurations": [
@@ -700,7 +700,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/',variables('ilbName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "ipConfigurations": [
@@ -730,7 +730,7 @@
       "location": "[variables('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "apiVersion": "2015-05-01-preview",
       "properties": {
@@ -761,7 +761,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "ipConfigurations": [
@@ -792,7 +792,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "ipConfigurations": [
@@ -828,7 +828,7 @@
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
         "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "ipConfigurations": [
@@ -1102,7 +1102,7 @@
         "[resourceId('Microsoft.Storage/storageAccounts',concat(variables('namePrefix'), '2'))]",
         "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sqlVMNamePrefix'), '1-nic'))]",
         "[resourceId('Microsoft.Compute/availabilitySets', variables('sqlAvailabilitySetName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "hardwareProfile": {
@@ -1178,7 +1178,7 @@
         "[resourceId('Microsoft.Storage/storageAccounts',concat(variables('namePrefix'), '3'))]",
         "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('sqlVMNamePrefix'), '2-nic'))]",
         "[resourceId('Microsoft.Compute/availabilitySets', variables('sqlAvailabilitySetName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "hardwareProfile": {
@@ -1254,7 +1254,7 @@
         "[resourceId('Microsoft.Storage/storageAccounts',concat(variables('namePrefix'), '0'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('sqlVMNamePrefix'), 'W-nic'))]",
         "[resourceId('Microsoft.Compute/availabilitySets', variables('sqlAvailabilitySetName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS2"
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
       ],
       "properties": {
         "hardwareProfile": {
