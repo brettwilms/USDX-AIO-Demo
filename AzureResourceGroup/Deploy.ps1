@@ -7,9 +7,9 @@ $VerbosePreference = "Continue"                     # set to SilentlyContinue to
 $ErrorActionPreference = "Stop"
 
 $templateFile = '.\azuredeploy.json'
-$ResourceGroupName = "bdx3"
+$ResourceGroupName = "bdx1"
 $SubscriptionName = 'bwdx-demo'
-$Location = "East US"
+$Location = "West US"
 
 
 Select-AzureSubscription -SubscriptionName $SubscriptionName
@@ -28,7 +28,9 @@ if($null -eq $rg)
     New-AzureResourceGroup -Name $ResourceGroupName -Location $location
 }
 
-$params = @{adminUserName=$CredentialsToSetInsideVM.UserName;adminPassword=$CredentialsToSetInsideVM.GetNetworkCredential().Password;StorageAccountType="Standard_LRS";DataDiskSizeGB=1023}
+$params = @{adminUserName=$CredentialsToSetInsideVM.UserName;adminPassword=$CredentialsToSetInsideVM.GetNetworkCredential().Password;StorageAccountType="Premium_LRS";DataDiskSizeGB=127}
+
+#Pause
 New-AzureResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $templateFile -TemplateParameterObject $params
 
 <#
