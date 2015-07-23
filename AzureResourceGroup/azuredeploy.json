@@ -1317,8 +1317,43 @@
       },
       "resources": [
 
-      ]
-      ,
+      ],
+      "tags": {
+        "Environment": "[variables('Namespace')]"
+      }
+    },
+
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('sqlVMNamePrefix'),'W/CreateFileShareWitness')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('sqlVMNamePrefix'), 'W')]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "1.7",
+        "settings": {
+          "modulesUrl": "[variables('dscFswModulesURL')]",
+          "configurationFunction": "[variables('dscFswConfigurationFunction')]",
+          "properties": {
+            "domainName": "[variables('domainDNS')]",
+            "sharePath": "[variables('sharePath')]",
+            "adminCreds": {
+              "userName": "[variables('adminUserName')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            }
+
+          }
+        },
+        "protectedSettings": {
+          "items": {
+            "adminPassword": "[variables('adminPassword')]"
+          }
+        }
+      },
       "tags": {
                 "Environment": "[variables('Namespace')]"
               }
@@ -1400,57 +1435,21 @@
             },
             "sQLServiceCreds": {
               "userName": "[variables('sqlServerServiceAccountUserName')]",
-							"password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
+              "password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
             }
           }
         },
         "protectedSettings": {
           "items": {
             "adminPassword": "[variables('adminPassword')]",
-						"sqlServerServiceAccountPassword": "[variables('sqlServerServiceAccountPassword')]"
+            "sqlServerServiceAccountPassword": "[variables('sqlServerServiceAccountPassword')]"
           }
         }
       },
       "tags": {
-                "Environment": "[variables('Namespace')]"
-              }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('sqlVMNamePrefix'),'W/CreateFileShareWitness')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('sqlVMNamePrefix'), 'W')]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Powershell",
-        "type": "DSC",
-        "typeHandlerVersion": "1.7",
-        "settings": {
-          "modulesUrl": "[variables('dscFswModulesURL')]",
-          "configurationFunction": "[variables('dscFswConfigurationFunction')]",
-          "properties": {
-            "domainName": "[variables('domainDNS')]",
-            "sharePath": "[variables('sharePath')]",
-            "adminCreds": {
-              "userName": "[variables('adminUserName')]",
-              "password": "PrivateSettingsRef:adminPassword"
-            }
-
-          }
-        },
-        "protectedSettings": {
-          "items": {
-            "adminPassword": "[variables('adminPassword')]"
-          }
-        }
-      },
-      "tags": {
-                "Environment": "[variables('Namespace')]"
-              }
+        "Environment": "[variables('Namespace')]"
+      }
     }
-
   ],
   "outputs": {
     "AdminUserName": {

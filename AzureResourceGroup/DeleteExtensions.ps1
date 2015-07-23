@@ -1,7 +1,7 @@
 ﻿$rg = 'bdx2'
 
 cls
-$vms = Get-AzureVM -ResourceGroupName $rg
+$vms = Get-AzureVM -ResourceGroupName $rg -Name SQL1
 foreach ($vm in $vms)
 {
     if($vm.Extensions -ne $null)
