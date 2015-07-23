@@ -88,7 +88,7 @@
     "assetLocation": "[parameters('AssetLocation')]",
     "clusterName": "[concat(variables('sqlVMNamePrefix'),'-fc')]",
     "databaseNames": [ "ConnectionBrokerHA", "ApplicationHA" ],
-    "domainDns": "[parameters('DomainDNS')",
+    "domainDns": "[parameters('DomainDNS')]",
     "domainNetBIOS": "[parameters('DomainNetBIOS')]",
     "dscADBDCConfigurationFunction": "CreateADBDC.ps1\\CreateADBDC",
     "dscADBDCModulesURL": "[concat(variables('assetLocation'),'/CreateADBDC.ps1.zip')]",

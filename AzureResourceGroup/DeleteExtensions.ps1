@@ -1,4 +1,4 @@
-﻿$rg = 'bdx1'
+﻿$rg = 'bdx2'
 
 cls
 $vms = Get-AzureVM -ResourceGroupName $rg
