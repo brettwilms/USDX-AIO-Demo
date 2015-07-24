@@ -1,6 +1,12 @@
 ﻿Param(
-      [Parameter(Mandatory=$True,Position=1)]
-       [string]$filePath
+       [Parameter(Mandatory=$True,Position=1)]
+       [string]$templateFile,
+       [Parameter(Mandatory=$True,Position=2)]
+       [string]$ResourceGroupName,
+       [Parameter(Mandatory=$True,Position=3)]
+       [string]$SubscriptionName,
+       [Parameter(Position=4)]
+       [string]$Location = "West US"
     )
 
 
@@ -8,8 +14,6 @@ Switch-AzureMode -Name AzureResourceManager
 $VerbosePreference = "Continue"                     # set to SilentlyContinue to suppress output
 $ErrorActionPreference = "Stop"
 
-$templateFile = $filePath
-$ResourceGroupName = "bdx1"
 $SubscriptionName = 'bwdx-demo'
 $Location = "West US"
 

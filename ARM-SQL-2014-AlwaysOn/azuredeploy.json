@@ -20,7 +20,7 @@
       "metadata": {
         "description": "The location of resources that the script is dependent on such as linked templates and DSC modules"
       },
-      "defaultValue": "https://raw.githubusercontent.com/brettwilms/USDX-AIO-Demo/master/"
+      "defaultValue": "https://raw.githubusercontent.com/brettwilms/USDX-AIO-Demo/master"
     },
     "DataDiskSizeGB": {
       "type": "int",
@@ -84,7 +84,7 @@
     "adsAvailabilitySetName": "[concat(variables('namePrefix'),'ads')]",
     "adsVMNamePrefix": "DC",
     "assetLocation": "[parameters('AssetLocation')]",
-    "assetLocationDSC": "[concat(variables('assetLocation'),'/ARM-DSC')]",
+    "assetLocationDSC": "[concat(variables('assetLocation'),'/DSC')]",
     "assetLocationCommon": "[concat(variables('assetLocation'),'/ARM-Common')]",
     "clusterName": "[concat(variables('sqlVMNamePrefix'),'-fc')]",
     "databaseNames": [ "ConnectionBrokerHA", "ApplicationHA" ],

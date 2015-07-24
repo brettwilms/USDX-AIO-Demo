@@ -1,18 +1,17 @@
-﻿Switch-AzureMode -Name AzureResourceManager
-
+﻿Param(
+       [Parameter(Mandatory=$True,Position=1)]
+       [string]$ResourceGroupName,
+       [Parameter(Mandatory=$True,Position=2)]
+       [string]$SubscriptionName
+    )
 
 $VerbosePreference = "Continue"                     # set to SilentlyContinue to suppress output
 $ErrorActionPreference = "Stop"
-
-$templateFile = '.\azuredeploy.json'
-$ResourceGroupName = "bdx0"
-$SubscriptionName = 'bwdx-demo'
-$Location = "West US"
-
+Switch-AzureMode -Name AzureResourceManager
 
 Select-AzureSubscription -SubscriptionName $SubscriptionName
 Select-AzureSubscription -SubscriptionName $SubscriptionName -Current
-
+Remove-AzureResourceGroup -Name $ResourceGroupName -Force
 
 <#
 Get-AzureVMUsage -Location $Location
