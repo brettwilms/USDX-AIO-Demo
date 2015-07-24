@@ -1,12 +1,14 @@
-﻿
-Set-Location "C:\Users\brettwil\Documents\GitHub\USDX-AIO-Demo\AzureResourceGroup"
+﻿Param(
+      [Parameter(Mandatory=$True,Position=1)]
+       [string]$filePath
+    )
+
+
 Switch-AzureMode -Name AzureResourceManager
-
-
 $VerbosePreference = "Continue"                     # set to SilentlyContinue to suppress output
 $ErrorActionPreference = "Stop"
 
-$templateFile = '.\azuredeploy.json'
+$templateFile = $filePath
 $ResourceGroupName = "bdx0"
 $SubscriptionName = 'bwdx-demo'
 $Location = "West US"
@@ -30,7 +32,7 @@ if($null -eq $rg)
 
 $params = @{adminUserName=$CredentialsToSetInsideVM.UserName;adminPassword=$CredentialsToSetInsideVM.GetNetworkCredential().Password;StorageAccountType="Premium_LRS";DataDiskSizeGB=127}
 
-#Pause
+Pause
 New-AzureResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $templateFile -TemplateParameterObject $params
 
 <#
