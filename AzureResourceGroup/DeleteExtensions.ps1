@@ -1,4 +1,4 @@
-﻿$rg = 'bdx2'
+﻿$rg = 'bdx0'
 
 cls
 $vms = Get-AzureVM -ResourceGroupName $rg -Name SQL1
