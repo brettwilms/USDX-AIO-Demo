@@ -2,13 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "AssetLocation": {
-      "type": "string",
-      "metadata": {
-        "description": "The location of resources that the script is dependent on such as linked templates and DSC modules"
-      },
-      "defaultValue": "https://raw.githubusercontent.com/brettwilms/USDX-AIO-Demo/master/"
-    },
     "AdminPassword": {
       "type": "securestring",
       "metadata": {
@@ -22,18 +15,18 @@
       },
       "defaultValue": "sqlAdministrator"
     },
-    "ExternalDnsPrefix": {
+    "AssetLocation": {
       "type": "string",
-      "defaultValue": "[resourceGroup().name]",
       "metadata": {
-        "description": "The external DNS prefix for the solution - will be prefixed to 'cloudapp.net'"
-      }
+        "description": "The location of resources that the script is dependent on such as linked templates and DSC modules"
+      },
+      "defaultValue": "https://raw.githubusercontent.com/brettwilms/USDX-AIO-Demo/master/"
     },
-    "Namespace": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().name]",
+    "DataDiskSizeGB": {
+      "type": "int",
+      "defaultValue": 1000,
       "metadata": {
-        "description": "The namespace of the solution"
+        "description": "The size of the data disks to create"
       }
     },
     "DomainDNS": {
@@ -50,11 +43,18 @@
         "description": "The NetBIOS name of the domain to create"
       }
     },
-    "DataDiskSizeGB": {
-      "type": "int",
-      "defaultValue": 1000,
+    "ExternalDnsPrefix": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
       "metadata": {
-        "description": "The size of the data disks to create"
+        "description": "The external DNS prefix for the solution - will be prefixed to 'cloudapp.net'"
+      }
+    },
+    "Namespace": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "metadata": {
+        "description": "The namespace of the solution"
       }
     },
     "StorageAccountType": {
@@ -101,14 +101,9 @@
     "dscSqlAOPrepareConfigurationFunction": "PrepareAlwaysOnSqlServer.ps1\\PrepareAlwaysOnSqlServer",
     "dscSqlAOPrepareModulesURL": "[concat(variables('assetLocationDSC'),'/PrepareAlwaysOnSqlServer.ps1.zip')]",
     "elbBackendPool1ID": "[concat(variables('elbID'),'/backendAddressPools/BackendPool1')]",
-    "elbBackendPool2ID": "[concat(variables('elbID'),'/backendAddressPools/BackendPool2')]",
-    "elbBackendPool3ID": "[concat(variables('elbID'),'/backendAddressPools/BackendPool3')]",
     "elbFrontEndIPConfigID": "[concat(variables('elbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
     "elbID": "[resourceId('Microsoft.Network/loadBalancers',variables('elbName'))]",
     "elbName": "[concat(variables('namePrefix'),'elb')]",
-    "elbProbe1ID": "[concat(variables('elbID'),'/probes/tcpProbe1')]",
-    "elbProbe2ID": "[concat(variables('elbID'),'/probes/tcpProbe2')]",
-    "elbProbe3ID": "[concat(variables('elbID'),'/probes/httpProbe1')]",
     "externalDnsPrefix": "[parameters('ExternalDnsPrefix')]",
     "ilbID": "[resourceId('Microsoft.Network/loadBalancers',variables('ilbName'))]",
     "ilbIPAddress": "10.0.2.7",
@@ -181,9 +176,6 @@
     "virtualNetworkName": "[concat(variables('namePrefix'),'vnet')]",
     "vNetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "vnetwithDNSTemplateUri": "[concat(variables('assetLocationCommon'),'/vnet-with-dns-server.json')]",
-    "webAvailabilitySetName": "[concat(variables('namePrefix'),'web')]",
-    "webVMCount": 2,
-    "webVMNamePrefix": "WEB",
     "windowsImageOffer": "WindowsServer",
     "windowsImagePublisher": "MicrosoftWindowsServer",
     "windowsImageSKU": "2012-R2-Datacenter"
@@ -238,15 +230,6 @@
         "platformFaultDomainCount": "3",
         "platformUpdateDomainCount": "3"
       },
-      "tags": {
-        "Environment": "[variables('Namespace')]"
-      }
-    },
-    {
-      "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('webAvailabilitySetName')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[variables('location')]",
       "tags": {
         "Environment": "[variables('Namespace')]"
       }
@@ -317,77 +300,6 @@
               "frontendPort": 50002,
               "backendPort": 3389,
               "enableFloatingIP": false
-            }
-          }
-        ],
-        "loadBalancingRules": [
-          {
-            "name": "LBRule1",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('elbBackendPool1ID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 443,
-              "backendPort": 443,
-              "enableFloatingIP": false,
-              "idleTimeoutInMinutes": 5,
-              "loadDistribution": "SourceIP",
-              "probe": {
-                "id": "[variables('elbProbe1ID')]"
-              }
-            }
-          },
-          {
-            "name": "LBRule2",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('elbBackendPool1ID')]"
-              },
-              "protocol": "udp",
-              "frontendPort": 3391,
-              "backendPort": 3391,
-              "enableFloatingIP": false,
-              "loadDistribution": "SourceIP",
-              "probe": {
-                "id": "[variables('elbProbe1ID')]"
-              }
-            }
-          }
-        ],
-        "probes": [
-          {
-            "name": "tcpProbe1",
-            "properties": {
-              "protocol": "tcp",
-              "port": 443,
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2"
-            }
-          },
-          {
-            "name": "tcpProbe2",
-            "properties": {
-              "protocol": "tcp",
-              "port": 80,
-              "intervalInSeconds": "5",
-              "numberOfProbes": "2"
-            }
-          },
-          {
-            "name": "httpProbe1",
-            "properties": {
-              "protocol": "Http",
-              "port": 80,
-              "requestPath": "/",
-              "intervalInSeconds": 5,
-              "numberOfProbes": 2
             }
           }
         ]
@@ -615,37 +527,6 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[variables('subnetDataRef')]"
-              }
-            }
-          }
-        ]
-      },
-      "tags": {
-        "Environment": "[variables('Namespace')]"
-      }
-    },
-    {
-      "name": "[concat(variables('webVMNamePrefix'), copyindex(),'-nic')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[variables('location')]",
-      "apiVersion": "2015-05-01-preview",
-      "copy": {
-        "name": "nicLoop",
-        "count": "[variables('webVMCount')]"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS1"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[variables('subnetFrontRef')]"
               }
             }
           }

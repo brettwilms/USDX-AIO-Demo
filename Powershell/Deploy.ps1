@@ -9,7 +9,7 @@ $VerbosePreference = "Continue"                     # set to SilentlyContinue to
 $ErrorActionPreference = "Stop"
 
 $templateFile = $filePath
-$ResourceGroupName = "bdx0"
+$ResourceGroupName = "bdx1"
 $SubscriptionName = 'bwdx-demo'
 $Location = "West US"
 

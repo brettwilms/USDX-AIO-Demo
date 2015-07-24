@@ -3,28 +3,21 @@
 This template will create a demo environment for USDX:
 
 +	A Virtual Network
-+	Six Storage Accounts
-+	One external and one internal load balancer
++	Several Storage Accounts
++	A vNet in the resource groups location with the following subnets:
+	+	Presentation
+	+	Application
+	+	Data
+	+	Secure
++	One external and one internal load balancer.
 +	Two Domain Controllers in an availability set.
 +	Three VMs in a Windows Server Cluster:
 	+ 	Two VMs run SQL Server 2014 with an availability group
 	+	The third is a File Share Witness for the Cluster
 	+	The SQL availability group is configured with 3 fault domains and 3 update domains
-+	A number of load balanced web servers in an availability set
-+	A number of load Remote Desktop gateway servers in an availability set
-+	A number of Remote Desktop Session Host servers in an availability set
 
 The external load balancer includes
 +	Two RDP NAT rules to allow connectivity to the two domain controllers (port 50001 and 50002).
-+	An Inbound load balanced rule on tcp port 80 to the web servers 
-	+	Client affinity = none 
-	+	HTTP probe = /
-+	An Inbound load balanced rule on tcp port 443 to the Remote Desktop Gateway servers
-	+	Client affinity = SourceIP
-	+	TCP probe to port 443
-+	An Inbound load balanced rule on udp port 3391 to the Remote Desktop Gateway servers
-	+	Client affinity = SourceIP 
-	+	TCP probe to port 443
 
 A SQL Server always on listener is created using the internal load balancer with the recommended configuration.
 
@@ -37,21 +30,16 @@ This issue will be fixed as soon as possible.
 
 + 	The images used to create this deployment are
 	+ 	AD - Latest Windows Server 2012 R2 Image
-	+ 	RD Gateway - Latest Windows Server 2012 R2 Image
-	+ 	RD Session Host - Latest Windows Server 2012 R2 Image
 	+ 	SQL Server - Latest SQL Server 2014 on Windows Server 2012 R2 Image
 	+ 	SQL Witness - Latest Windows Server 2012 R2 Image
-	+ 	Web - Latest Windows Server 2012 R2 Image
 
 + 	The image configuration is defined in variables - details below - but the scripts that configure this deployment have only been tested with these versions and may not work on other images.
-
 
 Click the button below to deploy from the portal
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fbrettwilms%2FUSDX-AIO-Demo%2Fmaster%2FARM-SQL-2014-AlwaysOn%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
-
 
 ## Deploying from PowerShell 
 
@@ -78,9 +66,15 @@ New-AzureResourceGroup -Name "<new resourcegroup name>" -Location "<new resource
 
 |Name|Description                                        |
 |:----|:-------------------------------------------------|
-|DnsPrefix|The DNS prefix for the public IP of the solution - Defaults to the resource group name|
-|Namespace|The namespace for the solution - Defaults to the resource group name|
-|location|Location where to deploy the resource <ul>**Allowed Values**<li>West US</li><li>East US **(default)**</li><li>West Europe</li><li>East Asia</li><li>Southeast Asia</li>|
+|AssetLocation|The location of resources that the script is dependent on such as linked templates and DSC modules|
+|AdminUserName|The name of the Administrator of the new VMs and Domain|
+|AdminPassword|The password for the Administrator account of the new VMs and Domain|
+|DataDiskSizeGB|The size of the data disks to create - Useful when using premium storage|
+|DomainDNS|The DNS name of the domain to create|
+|DomainNetBIOS|DomainNetBIOS|
+|ExternalDnsPrefix|The external DNS prefix for the solution - will be prefixed to 'cloudapp.net'|
+|Namespace|The namespace of the solution|
+|StorageAccountType|The type of the Storage Account created <ul>**Allowed Values**<li>Standard_LRS **(default)**</li><li>Standard_GRS</li><li>Standard_RAGRS</li><li>Premium_LRS</li>|
 
 
 ## Notable Variables
