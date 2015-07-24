@@ -4,7 +4,7 @@ Switch-AzureMode -Name AzureResourceManager
 
 
 $VerbosePreference = "Continue"                     # set to SilentlyContinue to suppress output
-$ErrorActionPreference = "Continue"
+$ErrorActionPreference = "Stop"
 
 $templateFile = '.\azuredeploy.json'
 $ResourceGroupName = "bdx3"

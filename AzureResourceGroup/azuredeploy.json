@@ -73,8 +73,6 @@
   },
   "variables": {
     "_adsVMSize": "Standard_DS2",
-    "_rdgVMSize": "Standard_DS2",
-    "_rdsVMSize": "Standard_DS2",
     "_sqlVMSize": "Standard_DS2",
     "_vmDiskSize": "[parameters('DataDiskSizeGB')]",
     "_webVMSize": "Standard_DS2",
@@ -125,13 +123,6 @@
     "portHTTP": 80,
     "portRDP": 3389,
     "portSSL": 443,
-    "portUDP": 3391,
-    "rdgVMCount": 2,
-    "rdgVMNamePrefix": "GW",
-    "rdsAvailabilitySetName": "[concat(variables('namePrefix'),'rds')]",
-    "rdsVMCount": 2,
-    "rdsVMNamePrefix": "RDS",
-    "rgwAvailabilitySetName": "[concat(variables('namePrefix'),'rgw')]",
     "sharePath": "[concat(variables('namePrefix'),'-fsw')]",
     "sqlAOAGName": "[concat(variables('sqlVMNamePrefix'),'-ag')]",
     "sqlAOEPName": "[concat(variables('sqlVMNamePrefix'),'-hadr')]",
@@ -251,24 +242,6 @@
     },
     {
       "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('rdsAvailabilitySetName')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[variables('location')]",
-      "tags": {
-        "Environment": "[variables('Namespace')]"
-      }
-    },
-    {
-      "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('rgwAvailabilitySetName')]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[variables('location')]",
-      "tags": {
-        "Environment": "[variables('Namespace')]"
-      }
-    },
-    {
-      "type": "Microsoft.Compute/availabilitySets",
       "name": "[variables('webAvailabilitySetName')]",
       "apiVersion": "2015-05-01-preview",
       "location": "[variables('location')]",
@@ -317,14 +290,6 @@
           {
             "name": "BackendPool1"
 
-          },
-          {
-            "name": "BackendPool2"
-
-          },
-          {
-            "name": "BackendPool3"
-
           }
         ],
         "inboundNatRules": [
@@ -348,90 +313,6 @@
               },
               "protocol": "tcp",
               "frontendPort": 50002,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP3",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50003,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP4",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50004,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP5",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50005,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP6",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50006,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP7",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50007,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP8",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50008,
-              "backendPort": 3389,
-              "enableFloatingIP": false
-            }
-          },
-          {
-            "name": "RDP9",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 50009,
               "backendPort": 3389,
               "enableFloatingIP": false
             }
@@ -474,25 +355,6 @@
               "loadDistribution": "SourceIP",
               "probe": {
                 "id": "[variables('elbProbe1ID')]"
-              }
-            }
-          },
-          {
-            "name": "LBRule3",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('elbFrontEndIPConfigID')]"
-              },
-              "backendAddressPool": {
-                "id": "[variables('elbBackendPool3ID')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 80,
-              "backendPort": 80,
-              "enableFloatingIP": false,
-              "loadDistribution": "Default",
-              "probe": {
-                "id": "[variables('elbProbe3ID')]"
               }
             }
           }
@@ -615,7 +477,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                  "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool2')]"
+                  "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool1')]"
                 }
               ],
               "loadBalancerInboundNatRules": [
@@ -653,7 +515,7 @@
               },
               "loadBalancerBackendAddressPools": [
                 {
-                  "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool2')]"
+                  "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool1')]"
                 }
               ],
               "loadBalancerInboundNatRules": [
@@ -761,72 +623,6 @@
       }
     },
     {
-      "name": "[concat(variables('rdsVMNamePrefix'), copyindex(),'-nic')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[variables('location')]",
-      "apiVersion": "2015-05-01-preview",
-      "copy": {
-        "name": "nicLoop",
-        "count": "[variables('rdsVMCount')]"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS1"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[variables('subnetApplicationRef')]"
-              }
-            }
-          }
-        ]
-      },
-      "tags": {
-        "Environment": "[variables('Namespace')]"
-      }
-    },
-    {
-      "name": "[concat(variables('rdgVMNamePrefix'), copyindex(),'-nic')]",
-      "type": "Microsoft.Network/networkInterfaces",
-      "location": "[variables('location')]",
-      "apiVersion": "2015-05-01-preview",
-      "copy": {
-        "name": "nicLoop",
-        "count": "[variables('rdgVMCount')]"
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/loadBalancers/', variables('elbName'))]",
-        "Microsoft.Resources/deployments/UpdateVNetDNS1"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[variables('subnetApplicationRef')]"
-              },
-              "loadBalancerBackendAddressPools": [
-                {
-                  "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool1')]"
-                }
-              ]
-            }
-          }
-        ]
-      },
-      "tags": {
-        "Environment": "[variables('Namespace')]"
-      }
-    },
-    {
       "name": "[concat(variables('webVMNamePrefix'), copyindex(),'-nic')]",
       "type": "Microsoft.Network/networkInterfaces",
       "location": "[variables('location')]",
@@ -848,12 +644,7 @@
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
                 "id": "[variables('subnetFrontRef')]"
-              },
-              "loadBalancerBackendAddressPools": [
-                {
-                  "id": "[concat(variables('elbID'), '/backendAddressPools/BackendPool3')]"
-                }
-              ]
+              }
             }
           }
         ]
@@ -952,8 +743,8 @@
             }
           },
           "tags": {
-                    "Environment": "[variables('Namespace')]"
-                  }
+            "Environment": "[variables('Namespace')]"
+          }
         }
       ],
       "tags": {
@@ -1355,8 +1146,8 @@
         }
       },
       "tags": {
-                "Environment": "[variables('Namespace')]"
-              }
+        "Environment": "[variables('Namespace')]"
+      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
@@ -1383,20 +1174,20 @@
             },
             "sqlServiceCreds": {
               "userName": "[variables('sqlServerServiceAccountUserName')]",
-							"password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
+              "password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
             }
           }
         },
         "protectedSettings": {
           "items": {
             "adminPassword": "[variables('adminPassword')]",
-						"sqlServerServiceAccountPassword": "[variables('sqlServerServiceAccountPassword')]"
+            "sqlServerServiceAccountPassword": "[variables('sqlServerServiceAccountPassword')]"
           }
         }
       },
       "tags": {
-                "Environment": "[variables('Namespace')]"
-              }
+        "Environment": "[variables('Namespace')]"
+      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
@@ -1451,16 +1242,16 @@
       }
     }
   ],
-  "outputs": {
-    "AdminUserName": {
-      "value": "[variables('AdminUserName')]",
-      "type": "string"
-    },
-    "AdminPassword": {
-			"value": "[variables('AdminPassword')]",
-			"type" : "string"
-		}
-  }
-}
+      "outputs": {
+        "AdminUserName": {
+          "value": "[variables('AdminUserName')]",
+          "type": "string"
+        },
+        "AdminPassword": {
+          "value": "[variables('AdminPassword')]",
+          "type": "string"
+        }
+      }
+    }
 
 
