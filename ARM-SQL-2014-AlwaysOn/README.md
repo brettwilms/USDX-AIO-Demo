@@ -37,9 +37,7 @@ This issue will be fixed as soon as possible.
 
 Click the button below to deploy from the portal
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fbrettwilms%2FUSDX-AIO-Demo%2Fmaster%2FARM-SQL-2014-AlwaysOn%2Fazuredeploy.json" target="_blank">
-    <img src="http://azuredeploy.net/deploybutton.png"/>
-</a>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fbrettwilms%2FUSDX-AIO-Demo%2Fmaster%2FARM-SQL-2014-AlwaysOn%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
 
 ## Deploying from PowerShell 
 
