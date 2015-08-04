@@ -1,7 +1,6 @@
 # USDX-AIO-Demos
 
-20 cores - the number of cores assigned to a trial Azure subscription.
-The intent of the project is to provide a series of different Azure demo environments which demonstrate the capabilities of the platform whilst fiting within the trial subscription quotas.
+The intent of the project is to provide a series of different Azure demo environments which demonstrate the capabilities of the platform whilst remaining within the quotas imposed on a trial Azure subscription.
 
 # Current Demo Environments
 +	SQL 2014 Always-On cluster
